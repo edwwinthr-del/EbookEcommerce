@@ -33,7 +33,9 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
-            'serve' => true,
+            // Never serve e-book files by URL; downloads go through the
+            // ownership-checked library route only.
+            'serve' => false,
             'throw' => false,
         ],
 

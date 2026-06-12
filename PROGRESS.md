@@ -2,7 +2,18 @@
 # E-Book Store — Build Progress
 
 ## CURRENT STATE
-Phase 5 complete (commit b09b4bd). Billable on User, Cashier migrations published+run, Stripe env placeholders in .env/.env.example. POST /checkout/{book} (auth, 403 if owned, 404 if draft) creates pending order + DB-priced order_items, Stripe session via StripeCheckoutService (mockable), session id stored, Inertia::location to Stripe. GET /checkout/{book} resume route makes guest→login→intended flow work. HandleStripeWebhook listener (WebhookReceived, checkout.session.completed) is the ONLY entitlement grant — idempotent, syncWithoutDetaching with order_id. Success page display-only; cancel_url returns to book page. /library with downloads (ownsBook + private disk), /orders history. CheckoutTest: 8 tests incl. all 4 spec-required. Suite: 43 tests / 164 assertions green. Next step: Phase 6.1 — 3D book covers.
+ALL PHASES COMPLETE. The e-book store is fully built per the spec: Laravel 12 + React/Inertia starter kit, full schema with entitlement pivot, admin panel with secure uploads, public catalog with search/filter/sort, Stripe Checkout via Cashier with webhook-only entitlement granting, My Library with ownership-checked private-disk downloads, and the playful animated frontend (Fraunces, 3D covers, spring animations, confetti, reduced-motion support). Test suite: 43 tests / 164 assertions, all green. README documents setup, env vars, `stripe listen`, php.ini limits, and seeded credentials.
+
+The only thing not exercised end-to-end is a real Stripe round trip (placeholder API keys in .env). To do it: put real test keys in .env, run `stripe listen --forward-to localhost:8000/stripe/webhook`, copy the whsec into STRIPE_WEBHOOK_SECRET, buy a book with card 4242 4242 4242 4242. Every step around Stripe (order creation, DB pricing, webhook handling, entitlement, download) is covered by automated tests and the simulated-webhook manual verification below.
+
+## MANUAL VERIFICATION RESULTS (Phase 7.2, 2026-06-13)
+- Purchase flow (simulated webhook, real keys not available): pending order + DB-priced item → `WebhookReceived(checkout.session.completed)` → order paid ✓, book attached to user's library ✓, file downloadable from private disk ✓.
+- Private file URL: GET /storage/ebooks/{file}.pdf → 404 ✓ (also set `serve=false` on the `local` disk for defense in depth).
+- Admin routes as guest → 302 to /login ✓; as customer → 403 (AdminAccessTest, all 8 routes) ✓.
+- Price edit as admin (6.42 → 99.99): existing order_items.price stayed 6.42 ✓.
+- Catalog HTTP smoke test: GET / → 200 ✓.
+
+Previous: Phase 6 complete (82aa34a), Phase 5 (b09b4bd). Billable on User, Cashier migrations published+run, Stripe env placeholders in .env/.env.example. POST /checkout/{book} (auth, 403 if owned, 404 if draft) creates pending order + DB-priced order_items, Stripe session via StripeCheckoutService (mockable), session id stored, Inertia::location to Stripe. GET /checkout/{book} resume route makes guest→login→intended flow work. HandleStripeWebhook listener (WebhookReceived, checkout.session.completed) is the ONLY entitlement grant — idempotent, syncWithoutDetaching with order_id. Success page display-only; cancel_url returns to book page. /library with downloads (ownsBook + private disk), /orders history. CheckoutTest: 8 tests incl. all 4 spec-required. Suite: 43 tests / 164 assertions green. Next step: Phase 6.1 — 3D book covers.
 
 ## DECISIONS
 - Environment: Windows 11 + XAMPP, PHP 8.5.5, Composer 2.9.7, Node 24.14.0, npm 11.9.0.
@@ -59,15 +70,15 @@ Phase 5 complete (commit b09b4bd). Billable on User, Cashier migrations publishe
 - [x] 5.8 DONE — CheckoutTest: tampering (a), webhook grant (b), success no-grant (c), 403 download (d) + owner download, auth redirect, idempotency extras
 
 ### Phase 6 — Playful animated frontend
-- [ ] 6.1 3D book covers (CSS perspective + spine from accent_color, hover spring tilt)
-- [ ] 6.2 Animated search results (layout + AnimatePresence)
-- [ ] 6.3 Page transitions for Inertia navigation
-- [ ] 6.4 Purchase celebration: confetti + book flying into library nav icon
-- [ ] 6.5 Friendly empty states
-- [ ] 6.6 Hard rules: transform/opacity only; prefers-reduced-motion; calm checkout
+- [x] 6.1 DONE — Book3D in book-card.tsx: .book-3d-scene perspective, ::before spine via --book-accent custom property, ::after page block, spring tilt toward cursor (useMotionValue/useSpring); cards rest at deterministic -3°..3° rotation, straighten on hover
+- [x] 6.2 DONE — catalog grid wrapped in motion layout + AnimatePresence popLayout (enter/exit scale+fade)
+- [x] 6.3 DONE — PageTransition component (AnimatePresence, fade + slide) in StoreLayout and AppLayout; keyed by pathname so search query updates don't re-trigger
+- [x] 6.4 DONE — success page: canvas-confetti once (ref-guarded) + book flies into #library-nav-link; "Yours forever." in Fraunces
+- [x] 6.5 DONE — empty states with icons + playful copy for empty search and empty library (no cart in this app by design)
+- [x] 6.6 DONE — all animations transform/opacity only; useReducedMotion gates every decorative animation + CSS media query kills spine transforms; checkout flow itself has no celebration
 
 ### Phase 7 — Polish & verification
-- [ ] 7.1 Full test suite green
-- [ ] 7.2 Manual verification checklist (record results here)
-- [ ] 7.3 Write README.md (setup, env vars, Stripe webhook, php.ini limits, admin credentials)
-- [ ] 7.4 Final commit; mark everything complete
+- [x] 7.1 DONE — full suite green: 43 tests / 164 assertions (deprecation notices from PHP 8.5 internals only)
+- [x] 7.2 DONE — see MANUAL VERIFICATION RESULTS above; real-key Stripe round trip documented as the one remaining manual step
+- [x] 7.3 DONE — README.md rewritten: setup, env vars, stripe listen, php.ini limits, seeded admin credentials, security model
+- [x] 7.4 DONE — final commit; PROGRESS.md complete
