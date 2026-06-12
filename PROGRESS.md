@@ -18,7 +18,7 @@ Previous: Phase 6 complete (82aa34a), Phase 5 (b09b4bd). Billable on User, Cashi
 ## DECISIONS
 - Environment: Windows 11 + XAMPP, PHP 8.5.5, Composer 2.9.7, Node 24.14.0, npm 11.9.0.
 - Used `laravel/react-starter-kit` v1.0.1 (the official Laravel 12 React+Inertia starter kit, successor to Breeze React). Laravel 12, React 19, Tailwind 4, TypeScript, shadcn/ui components, Pest tests.
-- Database: SQLite (spec allows it for local dev; XAMPP ships MariaDB, not PostgreSQL). Schema kept Postgres-compatible.
+- Database: started on SQLite, switched to PostgreSQL on 2026-06-13 (user provided credentials in .env: pgsql, localhost:5432, db "ebook"). All 15 migrations + seeder ran cleanly on Postgres. Tests still use in-memory SQLite via phpunit.xml.
 - Added a `private` disk (serve=false) alongside the default `local` disk; both root at `storage/app/private`. S3 config already present in filesystems.php for production.
 - Test suite shows PHP 8.5 deprecation notices (`PDO::MYSQL_ATTR_SSL_CA`) from framework internals — harmless, all assertions pass.
 - Cashier v16.5.3, stripe-php v17.6.0, motion + canvas-confetti via npm.
