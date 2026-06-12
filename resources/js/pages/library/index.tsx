@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { Download } from 'lucide-react';
+import { BookHeart, Download } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'My Library', href: '/library' }];
 
@@ -41,7 +41,8 @@ export default function LibraryIndex({ books }: { books: LibraryBook[] }) {
                     </div>
                 ) : (
                     <div className="flex flex-col items-center gap-3 py-16 text-center text-muted-foreground">
-                        <p className="text-lg">Your library is feeling a little empty.</p>
+                        <BookHeart className="size-12 opacity-40" />
+                        <p className="font-serif text-xl">Your library is feeling a little empty.</p>
                         <p className="text-sm">Every great collection starts with one book.</p>
                         <Button asChild className="mt-2">
                             <Link href="/">Browse the catalog</Link>

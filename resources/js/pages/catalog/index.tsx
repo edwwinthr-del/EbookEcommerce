@@ -4,6 +4,8 @@ import { Input } from '@/components/ui/input';
 import StoreLayout from '@/layouts/store-layout';
 import { type Paginated } from '@/types';
 import { Head, router } from '@inertiajs/react';
+import { SearchX } from 'lucide-react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 
 interface CategoryOption {
@@ -32,6 +34,7 @@ export default function CatalogIndex({
 }) {
     const [query, setQuery] = useState(filters.q);
     const isFirstRender = useRef(true);
+    const reduceMotion = useReducedMotion();
 
     const applyFilters = (next: Partial<Filters>) => {
         const params = { q: query, category: filters.category, sort: filters.sort, ...next };
@@ -95,16 +98,32 @@ export default function CatalogIndex({
                 </div>
 
                 {books.data.length > 0 ? (
-                    <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
-                        {books.data.map((book) => (
-                            <BookCard key={book.id} book={book} />
-                        ))}
-                    </div>
+                    <motion.div layout={!reduceMotion} className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
+                        <AnimatePresence mode="popLayout">
+                            {books.data.map((book) => (
+                                <motion.div
+                                    key={book.id}
+                                    layout={!reduceMotion}
+                                    initial={reduceMotion ? false : { opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={reduceMotion ? undefined : { opacity: 0, scale: 0.9 }}
+                                    transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+                                >
+                                    <BookCard book={book} />
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+                    </motion.div>
                 ) : (
-                    <div className="py-16 text-center text-muted-foreground">
-                        <p className="text-lg">No books found.</p>
+                    <motion.div
+                        initial={reduceMotion ? false : { opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="flex flex-col items-center gap-3 py-16 text-center text-muted-foreground"
+                    >
+                        <SearchX className="size-12 opacity-40" />
+                        <p className="font-serif text-xl">Not a single book matched.</p>
                         <p className="text-sm">Try a different search — the dragons are hiding.</p>
-                    </div>
+                    </motion.div>
                 )}
 
                 <Pagination links={books.links} />

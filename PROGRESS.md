@@ -1,7 +1,8 @@
+
 # E-Book Store — Build Progress
 
 ## CURRENT STATE
-Phase 4 complete (commit ba798e8). Public catalog at `/` (published only, paginated 12, BookCard grid with accent-color fallback covers), debounced search + category filter + price sort via Book scopes (published/search/inCategory/sorted, LOWER LIKE — Postgres-compatible), detail page `/books/{slug}` with Buy button (posts /checkout/{id}, lands in Phase 5) or "In your library" state, drafts 404. CatalogTest covers visibility/search/filter/sort/no-file_path-leak. Suite: 35 tests / 145 assertions green. Next step: Phase 5.1 — configure Cashier + Stripe env placeholders.
+Phase 5 complete (commit b09b4bd). Billable on User, Cashier migrations published+run, Stripe env placeholders in .env/.env.example. POST /checkout/{book} (auth, 403 if owned, 404 if draft) creates pending order + DB-priced order_items, Stripe session via StripeCheckoutService (mockable), session id stored, Inertia::location to Stripe. GET /checkout/{book} resume route makes guest→login→intended flow work. HandleStripeWebhook listener (WebhookReceived, checkout.session.completed) is the ONLY entitlement grant — idempotent, syncWithoutDetaching with order_id. Success page display-only; cancel_url returns to book page. /library with downloads (ownsBook + private disk), /orders history. CheckoutTest: 8 tests incl. all 4 spec-required. Suite: 43 tests / 164 assertions green. Next step: Phase 6.1 — 3D book covers.
 
 ## DECISIONS
 - Environment: Windows 11 + XAMPP, PHP 8.5.5, Composer 2.9.7, Node 24.14.0, npm 11.9.0.
@@ -48,14 +49,14 @@ Phase 4 complete (commit ba798e8). Public catalog at `/` (published only, pagina
 - [x] 4.4 DONE — catalog routes are guest-accessible; checkout will sit behind auth middleware (intended-URL resume handled in Phase 5)
 
 ### Phase 5 — Payments (Stripe) & library
-- [ ] 5.1 Configure Cashier with Stripe test keys (placeholders in `.env.example`)
-- [ ] 5.2 Buy endpoint (`POST /checkout/{book}`): pending order + DB-priced order_items + Stripe Checkout session
-- [ ] 5.3 Webhook `checkout.session.completed`: mark paid, grant entitlement (ONLY place)
-- [ ] 5.4 Success page (thank-you only, no access grant); cancel page
-- [ ] 5.5 My Library page (`/library`) with Download buttons
-- [ ] 5.6 Download endpoint with `ownsBook` check + private disk download
-- [ ] 5.7 Customer order history page (`/orders`)
-- [ ] 5.8 Feature tests: price tampering, webhook grants access, success page doesn't, non-owner 403 on download
+- [x] 5.1 DONE — Billable trait, cashier migrations, STRIPE_* + CASHIER_CURRENCY placeholders in .env.example
+- [x] 5.2 DONE — CheckoutController@store + StripeCheckoutService (price_data.unit_amount from DB); stripe_session_id stored
+- [x] 5.3 DONE — HandleStripeWebhook listener registered in AppServiceProvider; Cashier verifies signature at /stripe/webhook
+- [x] 5.4 DONE — checkout/success.tsx ("Yours forever.", display-only); cancel_url = book detail page
+- [x] 5.5 DONE — LibraryController@index + library/index.tsx with Download buttons
+- [x] 5.6 DONE — download endpoint: abort_unless ownsBook 403, Storage private download as "{title}.{format}"
+- [x] 5.7 DONE — OrderHistoryController + orders/index.tsx (paginated 10)
+- [x] 5.8 DONE — CheckoutTest: tampering (a), webhook grant (b), success no-grant (c), 403 download (d) + owner download, auth redirect, idempotency extras
 
 ### Phase 6 — Playful animated frontend
 - [ ] 6.1 3D book covers (CSS perspective + spine from accent_color, hover spring tilt)

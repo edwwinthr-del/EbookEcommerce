@@ -1,4 +1,4 @@
-import { BookCover, type CatalogBook } from '@/components/book-card';
+import { Book3D, type CatalogBook } from '@/components/book-card';
 import { Button } from '@/components/ui/button';
 import StoreLayout from '@/layouts/store-layout';
 import { Head, Link, router } from '@inertiajs/react';
@@ -29,14 +29,14 @@ export default function CatalogShow({ book, owned }: { book: BookDetail; owned: 
             <Head title={book.title} />
 
             <div className="grid gap-8 md:grid-cols-[280px_1fr]">
-                <div className="aspect-2/3 w-full max-w-[280px] overflow-hidden rounded-lg border shadow-md">
-                    <BookCover book={book} />
+                <div className="w-full max-w-[280px]">
+                    <Book3D book={book} maxTilt={10} />
                 </div>
 
                 <div className="flex flex-col gap-4">
                     {book.category && <span className="text-sm text-muted-foreground">{book.category.name}</span>}
                     <div>
-                        <h1 className="text-3xl font-semibold">{book.title}</h1>
+                        <h1 className="font-serif text-4xl font-semibold">{book.title}</h1>
                         <p className="mt-1 text-lg text-muted-foreground">by {book.author}</p>
                     </div>
 

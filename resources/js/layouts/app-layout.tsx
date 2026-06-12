@@ -1,3 +1,4 @@
+import PageTransition from '@/components/page-transition';
 import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout';
 import { type BreadcrumbItem } from '@/types';
 
@@ -8,6 +9,6 @@ interface AppLayoutProps {
 
 export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => (
     <AppLayoutTemplate breadcrumbs={breadcrumbs} {...props}>
-        {children}
+        <PageTransition>{children}</PageTransition>
     </AppLayoutTemplate>
 );

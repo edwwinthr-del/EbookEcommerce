@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/fraunces';
 
 @plugin 'tailwindcss-animate';
 
@@ -9,6 +10,8 @@
 @theme {
     --font-sans:
         'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --font-serif: 'Fraunces Variable', ui-serif, Georgia, serif;
 
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
@@ -154,5 +157,51 @@
 
     body {
         @apply bg-background text-foreground;
+    }
+}
+
+/* 3D book cover: perspective container + spine pseudo-element driven by
+   the per-book --book-accent custom property. Only transform/opacity are
+   animated. */
+.book-3d-scene {
+    perspective: 1000px;
+}
+
+.book-3d {
+    position: relative;
+    transform-style: preserve-3d;
+}
+
+.book-3d::before {
+    content: '';
+    position: absolute;
+    top: 1px;
+    bottom: 1px;
+    left: 0;
+    width: 14px;
+    background: var(--book-accent, #6366f1);
+    filter: brightness(0.65);
+    transform: rotateY(-78deg) translateX(-7px);
+    transform-origin: left center;
+}
+
+.book-3d::after {
+    /* page block on the right edge */
+    content: '';
+    position: absolute;
+    top: 3px;
+    bottom: 3px;
+    right: 0;
+    width: 10px;
+    background: repeating-linear-gradient(to bottom, #f5f1e8 0px, #f5f1e8 2px, #d8d3c5 3px);
+    transform: rotateY(72deg) translateX(5px);
+    transform-origin: right center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .book-3d,
+    .book-3d::before,
+    .book-3d::after {
+        transform: none !important;
     }
 }
