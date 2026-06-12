@@ -1,7 +1,7 @@
 # E-Book Store — Build Progress
 
 ## CURRENT STATE
-Phase 3 complete (commit 3e1c6f7). Admin panel done: dashboard with stats, book CRUD with file/cover uploads (FormRequests, private/public disks, old-file cleanup on re-upload and delete), orders page, sidebar Admin link (cosmetic), AdminAccessTest proves 403 for non-admins on all /admin routes. `storage:link` created; README documents php.ini upload limits. Suite: 29 tests / 81 assertions green. Next step: Phase 4.1 — public catalog page (`/`).
+Phase 4 complete (commit ba798e8). Public catalog at `/` (published only, paginated 12, BookCard grid with accent-color fallback covers), debounced search + category filter + price sort via Book scopes (published/search/inCategory/sorted, LOWER LIKE — Postgres-compatible), detail page `/books/{slug}` with Buy button (posts /checkout/{id}, lands in Phase 5) or "In your library" state, drafts 404. CatalogTest covers visibility/search/filter/sort/no-file_path-leak. Suite: 35 tests / 145 assertions green. Next step: Phase 5.1 — configure Cashier + Stripe env placeholders.
 
 ## DECISIONS
 - Environment: Windows 11 + XAMPP, PHP 8.5.5, Composer 2.9.7, Node 24.14.0, npm 11.9.0.
@@ -42,10 +42,10 @@ Phase 3 complete (commit 3e1c6f7). Admin panel done: dashboard with stats, book 
 - [x] 3.8 DONE — tests/Feature/Admin/AdminAccessTest.php (403 for all 8 admin routes; guest redirect; admin 200)
 
 ### Phase 4 — Public catalog & search
-- [ ] 4.1 Catalog page (`/`): published books, paginated
-- [ ] 4.2 Search `q` (title/author), category filter, price sort as Eloquent scopes
-- [ ] 4.3 Book detail page (`/books/{slug}`) with Buy / "In your library"
-- [ ] 4.4 Guests browse freely; buying requires login with intended URL redirect
+- [x] 4.1 DONE — CatalogController@index + catalog/index.tsx, StoreLayout for public pages, published-only paginate(12)
+- [x] 4.2 DONE — scopes on Book (search uses LOWER(...) LIKE for case-insensitivity on SQLite+Postgres); validated query params q/category/sort
+- [x] 4.3 DONE — `/books/{slug}` route-model-bound by slug; owned flag from ownsBook; Buy posts to /checkout/{id}
+- [x] 4.4 DONE — catalog routes are guest-accessible; checkout will sit behind auth middleware (intended-URL resume handled in Phase 5)
 
 ### Phase 5 — Payments (Stripe) & library
 - [ ] 5.1 Configure Cashier with Stripe test keys (placeholders in `.env.example`)
