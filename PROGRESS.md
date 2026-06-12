@@ -1,19 +1,24 @@
 # E-Book Store — Build Progress
 
 ## CURRENT STATE
-PROGRESS.md created. Nothing built yet. Next step: Phase 1.1 — create Laravel project with the React + Inertia starter kit.
+Phase 1 complete (commit 0206d43). Laravel 12 + React starter kit scaffolded at project root, SQLite DB migrated, `private` disk added, Cashier/motion/canvas-confetti installed, git initialized. Test suite passes (26 tests / 63 assertions). Next step: Phase 2.1 — add `is_admin` boolean to users table.
 
 ## DECISIONS
 - Environment: Windows 11 + XAMPP, PHP 8.5.5, Composer 2.9.7, Node 24.14.0, npm 11.9.0.
+- Used `laravel/react-starter-kit` v1.0.1 (the official Laravel 12 React+Inertia starter kit, successor to Breeze React). Laravel 12, React 19, Tailwind 4, TypeScript, shadcn/ui components, Pest tests.
+- Database: SQLite (spec allows it for local dev; XAMPP ships MariaDB, not PostgreSQL). Schema kept Postgres-compatible.
+- Added a `private` disk (serve=false) alongside the default `local` disk; both root at `storage/app/private`. S3 config already present in filesystems.php for production.
+- Test suite shows PHP 8.5 deprecation notices (`PDO::MYSQL_ATTR_SSL_CA`) from framework internals — harmless, all assertions pass.
+- Cashier v16.5.3, stripe-php v17.6.0, motion + canvas-confetti via npm.
 
 ## CHECKLIST
 
 ### Phase 1 — Project setup
-- [ ] 1.1 Create Laravel project with React + Inertia starter kit; confirm auth pages work
-- [ ] 1.2 Configure `.env` for local database; run initial migrations
-- [ ] 1.3 Add `private` local disk to `config/filesystems.php` rooted at `storage/app/private`
-- [ ] 1.4 Install `laravel/cashier`, `motion`, `canvas-confetti`
-- [ ] 1.5 Initialize git, first commit
+- [x] 1.1 DONE — `laravel/react-starter-kit` v1.0.1 scaffolded; auth confirmed via passing Pest suite (login/register/logout/password-reset tests)
+- [x] 1.2 DONE — `.env` uses SQLite (`database/database.sqlite`); initial migrations ran (users, cache, jobs)
+- [x] 1.3 DONE — `private` disk added to `config/filesystems.php`, root `storage/app/private`, serve=false
+- [x] 1.4 DONE — `composer require laravel/cashier` (v16.5.3); `npm install motion canvas-confetti`
+- [x] 1.5 DONE — git init + root commit 0206d43
 
 ### Phase 2 — Database & models
 - [ ] 2.1 Add `is_admin` boolean to users via migration
