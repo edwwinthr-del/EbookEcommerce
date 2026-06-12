@@ -1,7 +1,7 @@
 # E-Book Store — Build Progress
 
 ## CURRENT STATE
-Phase 1 complete (commit 0206d43). Laravel 12 + React starter kit scaffolded at project root, SQLite DB migrated, `private` disk added, Cashier/motion/canvas-confetti installed, git initialized. Test suite passes (26 tests / 63 assertions). Next step: Phase 2.1 — add `is_admin` boolean to users table.
+Phase 2 complete (commit 39b2f23). Full schema migrated (is_admin, categories, books, orders, order_items, book_user), models with relationships + `User::ownsBook`, factories, BookStoreSeeder (1 admin, 3 customers, 5 categories, 20 published books with valid placeholder PDFs on private disk), admin Gate in AppServiceProvider. Verified via script: seed counts, private-disk files, ownsBook, Gate all correct. Test suite still green. Next step: Phase 3.1 — admin dashboard page (`/admin`).
 
 ## DECISIONS
 - Environment: Windows 11 + XAMPP, PHP 8.5.5, Composer 2.9.7, Node 24.14.0, npm 11.9.0.
@@ -21,12 +21,12 @@ Phase 1 complete (commit 0206d43). Laravel 12 + React starter kit scaffolded at 
 - [x] 1.5 DONE — git init + root commit 0206d43
 
 ### Phase 2 — Database & models
-- [ ] 2.1 Add `is_admin` boolean to users via migration
-- [ ] 2.2 Migrations + models: categories, books, orders, order_items, book_user pivot
-- [ ] 2.3 Relationships: User hasMany Orders; User belongsToMany Books; Book belongsTo Category; Order hasMany OrderItems
-- [ ] 2.4 `User::ownsBook(Book $book): bool` helper
-- [ ] 2.5 Factories + seeder: 1 admin, 3 customers, 5 categories, 20 published books with placeholder PDFs on private disk
-- [ ] 2.6 Admin Gate: `Gate::define('admin', fn ($user) => $user->is_admin);`
+- [x] 2.1 DONE — migration `2026_06_12_225823_add_is_admin_to_users_table` (boolean, default false)
+- [x] 2.2 DONE — migrations + models for categories, books, orders, order_items, book_user (unique book_id+user_id, nullable order_id FK)
+- [x] 2.3 DONE — relationships in User/Book/Category/Order/OrderItem (plus inverse: Category hasMany Books, Book belongsToMany owners)
+- [x] 2.4 DONE — `User::ownsBook()` in app/Models/User.php
+- [x] 2.5 DONE — 4 factories + BookStoreSeeder; placeholder PDFs generated per book at `ebooks/{slug}.pdf` on private disk; seeder verified
+- [x] 2.6 DONE — `Gate::define('admin', ...)` in AppServiceProvider::boot
 
 ### Phase 3 — Admin panel (book CRUD)
 - [ ] 3.1 Admin dashboard (`/admin`): counts of books, orders, total revenue

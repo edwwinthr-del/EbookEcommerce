@@ -1,4 +1,13 @@
-# Laravel + React Starter Kit
+# E-Book Store
+
+## PHP upload limits
+
+Admin book uploads accept e-book files up to 50 MB. PHP's defaults are far lower, so raise these in `php.ini` (XAMPP: `C:\xampp\php\php.ini`) and restart the web server:
+
+```ini
+upload_max_filesize = 51M
+post_max_size = 52M
+```
 
 ## Introduction
 
