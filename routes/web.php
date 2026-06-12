@@ -3,12 +3,12 @@
 use App\Http\Controllers\Admin\BookController as AdminBookController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\CatalogController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('welcome');
-})->name('home');
+Route::get('/', [CatalogController::class, 'index'])->name('home');
+Route::get('books/{book:slug}', [CatalogController::class, 'show'])->name('books.show');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', function () {

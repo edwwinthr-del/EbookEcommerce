@@ -1,7 +1,7 @@
 # E-Book Store — Build Progress
 
 ## CURRENT STATE
-Phase 2 complete (commit 39b2f23). Full schema migrated (is_admin, categories, books, orders, order_items, book_user), models with relationships + `User::ownsBook`, factories, BookStoreSeeder (1 admin, 3 customers, 5 categories, 20 published books with valid placeholder PDFs on private disk), admin Gate in AppServiceProvider. Verified via script: seed counts, private-disk files, ownsBook, Gate all correct. Test suite still green. Next step: Phase 3.1 — admin dashboard page (`/admin`).
+Phase 3 complete (commit 3e1c6f7). Admin panel done: dashboard with stats, book CRUD with file/cover uploads (FormRequests, private/public disks, old-file cleanup on re-upload and delete), orders page, sidebar Admin link (cosmetic), AdminAccessTest proves 403 for non-admins on all /admin routes. `storage:link` created; README documents php.ini upload limits. Suite: 29 tests / 81 assertions green. Next step: Phase 4.1 — public catalog page (`/`).
 
 ## DECISIONS
 - Environment: Windows 11 + XAMPP, PHP 8.5.5, Composer 2.9.7, Node 24.14.0, npm 11.9.0.
@@ -10,6 +10,9 @@ Phase 2 complete (commit 39b2f23). Full schema migrated (is_admin, categories, b
 - Added a `private` disk (serve=false) alongside the default `local` disk; both root at `storage/app/private`. S3 config already present in filesystems.php for production.
 - Test suite shows PHP 8.5 deprecation notices (`PDO::MYSQL_ATTR_SSL_CA`) from framework internals — harmless, all assertions pass.
 - Cashier v16.5.3, stripe-php v17.6.0, motion + canvas-confetti via npm.
+- Tests are class-based PHPUnit 11 (starter kit ships phpunit, NOT Pest, despite a leftover tests/Pest.php). New tests must extend Tests\TestCase with RefreshDatabase.
+- Starter kit has 4 pre-existing tsc strict errors in its own files (auth pages, welcome.tsx); not introduced by us, left untouched. Vite build is the gate.
+- Slugs are generated server-side from title with numeric suffix on collision; slug regenerates when title changes on update.
 
 ## CHECKLIST
 
@@ -29,14 +32,14 @@ Phase 2 complete (commit 39b2f23). Full schema migrated (is_admin, categories, b
 - [x] 2.6 DONE — `Gate::define('admin', ...)` in AppServiceProvider::boot
 
 ### Phase 3 — Admin panel (book CRUD)
-- [ ] 3.1 Admin dashboard (`/admin`): counts of books, orders, total revenue
-- [ ] 3.2 Book index (`/admin/books`): paginated table with edit/delete
-- [ ] 3.3 Book create form (`/admin/books/create`), multipart FormData
-- [ ] 3.4 Store endpoint with FormRequest validation; file → private disk, cover → public disk
-- [ ] 3.5 Book edit form; optional file re-upload deletes old file
-- [ ] 3.6 Delete endpoint: DB row + files removed
-- [ ] 3.7 Admin orders page (`/admin/orders`)
-- [ ] 3.8 Feature test: non-admin gets 403 on every `/admin` route
+- [x] 3.1 DONE — Admin/DashboardController + admin/dashboard.tsx (books, orders, paid revenue counts)
+- [x] 3.2 DONE — Admin/BookController@index + admin/books/index.tsx (paginate 15, edit/delete actions)
+- [x] 3.3 DONE — create form (shared book-form.tsx), multipart via Inertia forceFormData
+- [x] 3.4 DONE — StoreBookRequest (file mimes:pdf,epub max 51200; cover image max 2048; price numeric min 0); file→ebooks/ private, cover→covers/ public; php.ini limits documented in README
+- [x] 3.5 DONE — edit form; new file upload deletes old private file first (same for cover); slug regenerated on title change
+- [x] 3.6 DONE — destroy deletes DB row + e-book file + cover
+- [x] 3.7 DONE — Admin/OrderController + admin/orders/index.tsx (customer, items, total, status)
+- [x] 3.8 DONE — tests/Feature/Admin/AdminAccessTest.php (403 for all 8 admin routes; guest redirect; admin 200)
 
 ### Phase 4 — Public catalog & search
 - [ ] 4.1 Catalog page (`/`): published books, paginated
