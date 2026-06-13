@@ -12,6 +12,7 @@ interface BookDetail extends CatalogBook {
 
 export default function CatalogShow({ book, owned }: { book: BookDetail; owned: boolean }) {
     const [processing, setProcessing] = useState(false);
+    const isFree = parseFloat(book.price) === 0;
 
     const buy = () => {
         router.post(
@@ -40,7 +41,7 @@ export default function CatalogShow({ book, owned }: { book: BookDetail; owned: 
                         <p className="mt-1 text-lg text-muted-foreground">by {book.author}</p>
                     </div>
 
-                    <p className="text-2xl font-semibold">${book.price}</p>
+                    <p className="text-2xl font-semibold">{isFree ? 'Free' : `$${book.price}`}</p>
 
                     <p className="text-sm text-muted-foreground uppercase">{book.file_format}</p>
 
@@ -53,7 +54,13 @@ export default function CatalogShow({ book, owned }: { book: BookDetail; owned: 
                         </Button>
                     ) : (
                         <Button onClick={buy} disabled={processing} className="w-fit">
-                            {processing ? 'Heading to checkout…' : `Buy for $${book.price}`}
+                            {processing
+                                ? isFree
+                                    ? 'Adding to your library…'
+                                    : 'Heading to checkout…'
+                                : isFree
+                                  ? 'Get it free'
+                                  : `Buy for $${book.price}`}
                         </Button>
                     )}
 

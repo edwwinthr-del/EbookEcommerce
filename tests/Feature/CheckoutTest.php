@@ -45,6 +45,37 @@ class CheckoutTest extends TestCase
         $this->assertSame('cs_test_fake_session', $order->stripe_session_id);
     }
 
+    public function test_free_book_is_added_to_library_immediately_without_stripe()
+    {
+        $this->mock(StripeCheckoutService::class, function ($mock) {
+            $mock->shouldReceive('createSession')->never();
+        });
+
+        $user = User::factory()->create();
+        $book = Book::factory()->published()->create(['price' => 0]);
+
+        $response = $this->actingAs($user)->post("/checkout/{$book->id}");
+
+        $order = Order::sole();
+        $response->assertRedirect(route('checkout.success', ['order_id' => $order->id]));
+
+        $this->assertSame('paid', $order->status);
+        $this->assertSame('0.00', $order->total);
+        $this->assertSame('0.00', $order->items->sole()->price);
+        $this->assertNull($order->stripe_session_id);
+        $this->assertTrue($user->fresh()->ownsBook($book));
+    }
+
+    public function test_free_book_cannot_be_claimed_twice()
+    {
+        $user = User::factory()->create();
+        $book = Book::factory()->published()->create(['price' => 0]);
+        $user->books()->attach($book->id);
+
+        $this->actingAs($user)->post("/checkout/{$book->id}")->assertForbidden();
+        $this->assertDatabaseCount('orders', 0);
+    }
+
     public function test_checkout_is_forbidden_when_user_already_owns_the_book()
     {
         $user = User::factory()->create();

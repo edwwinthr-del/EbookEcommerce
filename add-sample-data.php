@@ -104,7 +104,7 @@ $books = [
     [
         'title' => 'The Little Book of Tea',
         'author' => 'Mira Holloway',
-        'price' => 4.99,
+        'price' => 0.00, // free sample book: downloads without Stripe
         'category' => 'Non-fiction',
         'accent' => '#0f766e',
         'description' => "A tiny, warm-hearted guide to brewing a proper cup of tea.\n\nTwo pages. One ritual. Zero excuses for sad, lukewarm tea. This is the sample book of the store — short enough to read while the kettle boils, and the perfect file to test your library downloads with.",

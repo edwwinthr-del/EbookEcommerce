@@ -24,6 +24,31 @@ class CheckoutController extends Controller
 
         abort_if($user->ownsBook($book), 403, 'You already own this book.');
 
+        // Free books skip Stripe entirely: the (DB) price is zero, so the
+        // order is complete and the entitlement can be granted right away.
+        if ((float) $book->price === 0.0) {
+            $order = DB::transaction(function () use ($user, $book) {
+                $order = Order::create([
+                    'user_id' => $user->id,
+                    'total' => 0,
+                    'status' => 'paid',
+                ]);
+
+                $order->items()->create([
+                    'book_id' => $book->id,
+                    'price' => 0,
+                ]);
+
+                $user->books()->syncWithoutDetaching([
+                    $book->id => ['order_id' => $order->id],
+                ]);
+
+                return $order;
+            });
+
+            return redirect()->route('checkout.success', ['order_id' => $order->id]);
+        }
+
         $order = DB::transaction(function () use ($user, $book) {
             $order = Order::create([
                 'user_id' => $user->id,
@@ -57,6 +82,13 @@ class CheckoutController extends Controller
         if ($sessionId = $request->query('session_id')) {
             $order = Order::with('items.book:id,title,slug')
                 ->where('stripe_session_id', $sessionId)
+                ->where('user_id', $request->user()->id)
+                ->first();
+        } elseif ($orderId = $request->query('order_id')) {
+            // Free-book orders have no Stripe session; look up by id,
+            // scoped to the current user. Display only.
+            $order = Order::with('items.book:id,title,slug')
+                ->whereKey($orderId)
                 ->where('user_id', $request->user()->id)
                 ->first();
         }

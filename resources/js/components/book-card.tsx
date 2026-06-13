@@ -86,7 +86,7 @@ export default function BookCard({ book }: { book: CatalogBook }) {
             <div>
                 <h3 className="font-serif font-medium leading-tight group-hover:underline">{book.title}</h3>
                 <p className="text-sm text-muted-foreground">{book.author}</p>
-                <p className="mt-1 text-sm font-semibold">${book.price}</p>
+                <p className="mt-1 text-sm font-semibold">{parseFloat(book.price) === 0 ? 'Free' : `$${book.price}`}</p>
             </div>
         </Link>
     );
