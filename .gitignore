@@ -21,6 +21,7 @@ secrets.json
 CLAUDE.md
 PROGRESS.md
 ebook-store-agent-prompt.md
+add-sample-data.php
 /.claude/
 
 # ---------------------------------------------------------------------------
